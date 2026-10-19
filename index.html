@@ -85,7 +85,7 @@
             };
         })();
 
-        // قاعدة البيانات الكاملة
+        // قاعدة البيانات الكاملة (لم يتم مسح أي شيء)
         const channelsData = {
             "قنوات ثمانية": [
                 { id: "thamanya1", name: "ثمانية 1", url: "https://scccrwb-live.cdn.intigral-ott.net/bpk-tv/STCT1/wv-pr/manifest.mpd174e90a58a1f2c024be4c9/cenc.mpd", k1: "714c789c76686632652eefc19f18c3db", k2: "962cee49ee9422b44a6c60a7999854ad" },
@@ -124,11 +124,11 @@
         let isExpanded = true; 
         let activeChannelId = null;
 
-        // الأيقونات بصيغة SVG مطابقة للصورة المرفقة
-        const iconExpandShrink = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7zm11-7h-2v3.59l-4.5-4.5-1.41 1.41 4.5 4.5H14v2h7v-7zM3 10h2V6.41l4.5 4.5 1.41-1.41-4.5-4.5H10V3H3v7zm14.5-2.5L13 12.09l1.41 1.41 4.5-4.5V10h2V3h-7v2h3.59z"/></svg>`;
-        const iconPiP = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h7v5h-7v-5z"/></svg>`;
-        const iconSettings = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.05-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22l-1.92 3.32c-.12.22-.07.49.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>`;
-        const iconFullscreen = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`;
+        // الأيقونات بصيغة صور Data URI المشفرة (Base64) ليقرأها المشغل بنجاح
+        const iconExpandShrink = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNMTAgMjF2LTJINi40MWw0LjUtNC41LTEuNDEtMS40MS00LjUgNC41VjE0SDN2N2g3em0xMS03aC0ydjMuNTlsLTQuNS00LjUtMS40MSAxLjQxIDQuNSA0LjVIMTR2Mmg3di03ek0zIDEwaDJWNi40MWw0LjUgNC41IDEuNDEtMS40MS00LjUtNC41SDEwVjNIM3Y3em0xNC41LTIuNUwxMyAxMi4wOWwxLjQxIDEuNDEgNC41LTQuNVYxMGgyVjNoLTd2MmgzLjU5eiIvPjwvc3ZnPg==';
+        const iconPiP = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNMjEgM0gzYy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE4YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6bTAgMTZIM1Y1aDE4djE0em0tMTAtN2g3djVoLTd2LTV6Ii8+PC9zdmc+';
+        const iconSettings = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNMTkuMTQgMTIuOTRjLjA0LS4zLjA2LS42MS4wNi0uOTQgMC0uMzItLjAyLS42NC0uMDYtLjk0bDIuMDMtMS41OGMuMTgtLjE0LjIzLS40MS4xMi0uNjFsLTEuOTItMy4zMmMtLjEyLS4yMi0uMzctLjI5LS41OS0uMjJsLTIuMzkuOTRjLS41LS4zOC0xLjAzLS43LTEuNjItLjk0bC0yLjM5LS40OGMtLjA1LS4yNC0uMjQtLjQxLS40OC0uNDFoLTMuODRjLS4yNCAwLS40My4xNy0uNDcuNDFsLS4zNiAyLjU0Yy0uNTkuMjQtMS4xMy41Ni0xLjYyLjk0bC0yLjM5LS45NGMtLjIyLS4wOC0uNDcgMC0uNTkuMjJsLTEuOTIgMy4zMmMtLjEyLjIyLS4wNy40OS4xMi42MWwyLjAzIDEuNThjLS4wNS4zLS4wOS42My0uMDkuOTRzLjAyLjY0LjA2Ljk0bC0yLjAzIDEuNThjLS4xOC4xNC0uMjMuNDEtLjEyLjYxbDEuOTIgMy4zMmMuMTIuMjIuMzcuMjkuNTkuMjJsMi4zOS0uOTZjLjUuMzggMS4wMy43IDEuNjIuOTRsLjM2IDIuNTRjLjA1LjI0LjI0LjQxLjQ4LjQxaDMuODRjLjI0IDAgLjQ0LS4xNy40Ny0uNDFsLjM2LTIuNTRjLjU5LS4yNCAxLjEzLS41NiAxLjYyLS45NGwyLjM5Ljk2Yy4yMi4wOC40NyAwIC41OS0uMjJsMS45Mi0zLjMyYy4xMi0uMjIuMDctLjQ5LS4xMi0uNjFsLTIuMDEtMS41OHpNMTIgMTUuNmMtMS45OCAwLTMuNi0xLjYyLTMuNi0zLjZzMS42Mi0zLjYgMy42LTMuNiAzLjYgMS42MiAzLjYgMy42LTEuNjIgMy42LTMuNiAzLjZ6Ii8+PC9zdmc+';
+        const iconFullscreen = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNNyAxNEg1djVoNXYtMkg3di0zem0tMi00aDJWN2gzVjVINXY1em0xMiA3aC0zdjJoNXYtNWgtMnYzek0xNCA1djJoM3YzaDJWNWgtNXoiLz48L3N2Zz4=';
 
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
@@ -139,7 +139,7 @@
                 const catDiv = document.createElement('div');
                 catDiv.className = 'mb-4';
                 
-                // خط القوائم الرئيسية باللون الأبيض (text-white)
+                // خط القوائم الرئيسية باللون الأبيض والمربع الأزرق
                 catDiv.innerHTML = `<h3 class="w-full block text-right text-white text-sm font-bold bg-slate-800/80 border border-blue-400/50 py-2 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
@@ -201,7 +201,7 @@
         }
 
         function addCustomButtons() {
-            // إضافة الأزرار بنفس ترتيب الصورة
+            // إضافة الأزرار المخصصة التي تم تحويلها لصور بنفس الترتيب
             
             // 1. زر توسيع وتضييق الشاشة
             currentPlayer.addButton(iconExpandShrink, 'تغيير أبعاد الصورة', function() {
