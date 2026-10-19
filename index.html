@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer" />
     
-    <!-- أيقونة الموقع المؤقتة -->
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3159/3159073.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,11 +18,10 @@
         body { background-color: #0f172a; overflow: hidden; margin: 0; }
         #jwplayerDiv { width: 100% !important; height: 100% !important; }
         
-        /* كلاسات التحكم في تمدد الفيديو */
-        .expanded-video video { object-fit: fill !important; }
-        .contained-video video { object-fit: contain !important; }
+        /* كلاسات التحكم التلقائي في الأبعاد */
+        .expanded-video video { object-fit: cover !important; } /* تمدد تلقائي لملء الشاشة */
+        .contained-video video { object-fit: contain !important; } /* أبعاد أصلية بدون اقتصاص */
         
-        /* تجميل شريط التمرير */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
@@ -31,46 +29,44 @@
 </head>
 <body class="text-white h-screen flex">
 
-    <!-- Sidebar / قائمة القنوات والبحث (مثبتة على اليسار) -->
+    <!-- Sidebar / قائمة القنوات -->
     <div class="w-72 bg-slate-900 h-full flex flex-col fixed left-0 top-0 border-r border-slate-800 z-50">
         
-        <!-- Header: البحث وزر الرئيسية (نفس عرض القائمة) -->
+        <!-- Header: زر الرئيسية ثم البحث -->
         <div class="p-4 bg-slate-800 flex items-center gap-2 border-b border-slate-700">
-            <button id="homeBtn" class="bg-slate-700 hover:bg-slate-600 text-white p-2 rounded transition" title="الشاشة الرئيسية / إغلاق البث">
+            <button id="homeBtn" class="bg-slate-700 hover:bg-slate-600 text-white p-2 rounded transition flex-shrink-0" title="الشاشة الرئيسية / إغلاق البث">
                 <i class="fa-solid fa-house"></i>
             </button>
             <div class="relative flex-1">
-                <input type="text" id="searchInput" placeholder="ابحث عن قناة..." class="w-full bg-slate-700 text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400">
-                <i class="fa-solid fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="ابحث عن قناة..." class="w-full bg-slate-700 text-white px-3 py-2 pr-9 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400">
+                <i class="fa-solid fa-search absolute right-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
         </div>
 
-        <!-- قائمة القنوات مقسمة لمجموعات -->
-        <div class="flex-1 overflow-y-auto p-2" id="channelListContainer">
-            <!-- سيتم حقن القنوات هنا عبر الجافاسكريبت -->
-        </div>
+        <!-- القنوات -->
+        <div class="flex-1 overflow-y-auto p-3" id="channelListContainer"></div>
     </div>
 
-    <!-- Main Content / منطقة الفيديو والصورة (على اليمين) -->
-    <div class="flex-1 h-full relative" style="margin-left: 18rem;"> <!-- 18rem = 72 (عرض القائمة) -->
+    <!-- Main Content / منطقة الفيديو -->
+    <div class="flex-1 h-full relative" style="margin-left: 18rem;">
         
-        <!-- صورة الشاشة الرئيسية -->
+        <!-- الشاشة الرئيسية -->
         <div id="homeScreen" class="absolute inset-0 z-10 bg-black flex flex-col items-center justify-center">
-            <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop" alt="TV Background" class="w-full h-full object-cover opacity-60">
-            <div class="absolute text-center bg-black/50 p-6 rounded-lg backdrop-blur-sm border border-gray-700">
-                <h1 class="text-4xl font-bold mb-4 text-white drop-shadow-lg">مرحباً بك في sc8tv</h1>
-                <p class="text-lg text-gray-300 drop-shadow-md">اختر قناة من القائمة الجانبية لبدء المشاهدة المباشرة</p>
+            <img src="https://images.unsplash.com/photo-1558888401-3cc1de77652d?q=80&w=2070&auto=format&fit=crop" alt="TV Background" class="w-full h-full object-cover opacity-50">
+            <div class="absolute text-center bg-black/60 p-8 rounded-xl backdrop-blur-md border border-gray-600">
+                <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg">sc8tv</h1>
+                <p class="text-lg text-gray-300 drop-shadow-md">اختر قناة من القائمة لبدء المشاهدة المباشرة</p>
             </div>
         </div>
 
-        <!-- حاوية المشغل -->
+        <!-- المشغل -->
         <div id="playerContainer" class="w-full h-full hidden z-20 absolute inset-0 bg-black">
-            <div id="jwplayerDiv"></div>
+            <div id="jwplayerDiv" class="expanded-video"></div>
         </div>
     </div>
 
     <script>
-        // تزوير الهوية (User-Agent) للسيرفر
+        // تزوير الهوية
         (function() {
             var originalFetch = window.fetch;
             var originalXHR = window.XMLHttpRequest;
@@ -87,7 +83,7 @@
             };
         })();
 
-        // قاعدة بيانات القنوات مقسمة لمجموعات
+        // قاعدة البيانات
         const channelsData = {
             "قنوات ثمانية": [
                 { id: "thamanya1", name: "ثمانية 1", url: "https://scccrwb-live.cdn.intigral-ott.net/bpk-tv/STCT1/wv-pr/manifest.mpd174e90a58a1f2c024be4c9/cenc.mpd", k1: "714c789c76686632652eefc19f18c3db", k2: "962cee49ee9422b44a6c60a7999854ad" },
@@ -123,35 +119,39 @@
         const channelListContainer = document.getElementById('channelListContainer');
         const searchInput = document.getElementById('searchInput');
         let currentPlayer = null;
-        let isExpanded = true; // الافتراضي تمدد الفيديو
+        let isExpanded = true; 
+        let activeChannelId = null;
 
-        // أيقونات زر التمديد/التضييق المخصصة
         const iconExpand = `<svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`;
         const iconShrink = `<svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>`;
 
-        // دالة عرض القنوات في القائمة
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
             for (const [category, channels] of Object.entries(channelsData)) {
-                // تصفية حسب البحث
                 const filteredChannels = channels.filter(ch => ch.name.includes(filter) || ch.id.toLowerCase().includes(filter.toLowerCase()));
                 if (filteredChannels.length === 0) continue;
 
-                // إنشاء قسم الباقة
+                // إضافة إطار خفيف وتدوير الحواف حول القسم بالكامل
                 const catDiv = document.createElement('div');
-                catDiv.className = 'mb-4';
-                catDiv.innerHTML = `<h3 class="text-gray-400 text-sm font-bold bg-gray-800 border-l-4 border-blue-500 py-1.5 px-3 mb-2 shadow-sm rounded-r">${category}</h3>`;
+                catDiv.className = 'mb-4 border border-slate-700 rounded-md p-1.5 bg-slate-800/50';
+                
+                catDiv.innerHTML = `<h3 class="text-gray-400 text-sm font-bold bg-slate-900 border-r-4 border-blue-500 py-2 px-3 mb-2 rounded-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
                 ul.className = 'space-y-1';
                 
                 filteredChannels.forEach(ch => {
                     const li = document.createElement('li');
+                    
+                    // تحديد إذا كانت القناة هي النشطة لإعطائها لون أزرق ثابت
+                    const isActive = activeChannelId === ch.id;
+                    const bgClass = isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-slate-700 hover:text-white';
+                    
                     li.innerHTML = `
-                        <button onclick="playChannel('${ch.url}', '${ch.k1}', '${ch.k2}')" 
-                            class="w-full text-right px-3 py-2 text-sm text-gray-200 hover:bg-blue-600 hover:text-white rounded transition flex justify-between items-center group">
+                        <button onclick="playChannel('${ch.id}', '${ch.url}', '${ch.k1}', '${ch.k2}')" 
+                            class="w-full text-right px-3 py-2.5 text-sm rounded transition flex justify-between items-center group ${bgClass}">
                             <span>${ch.name}</span>
-                            <i class="fa-solid fa-play text-xs opacity-0 group-hover:opacity-100 transition"></i>
+                            <i class="fa-solid fa-play text-xs ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition"></i>
                         </button>
                     `;
                     ul.appendChild(li);
@@ -161,44 +161,37 @@
                 channelListContainer.appendChild(catDiv);
             }
             
-            // رسالة في حالة عدم العثور على نتائج
             if (channelListContainer.innerHTML === '') {
-                channelListContainer.innerHTML = '<div class="text-gray-500 text-center mt-10 text-sm">لا توجد قنوات مطابقة للبحث</div>';
+                channelListContainer.innerHTML = '<div class="text-gray-500 text-center mt-10 text-sm">لا توجد قنوات مطابقة</div>';
             }
         }
 
-        // دالة تشغيل القناة وإعداد المشغل
-        function playChannel(url, k1, k2) {
+        function playChannel(id, url, k1, k2) {
+            // تحديث القناة النشطة وإعادة رسم القائمة لتحديث الألوان
+            activeChannelId = id;
+            renderChannels(searchInput.value);
+
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('playerContainer').classList.remove('hidden');
             
-            if (currentPlayer) {
-                currentPlayer.remove();
-            }
+            if (currentPlayer) currentPlayer.remove();
 
-            // إعادة إنشاء ديف المشغل وتطبيق كلاس التمدد/التضييق الحالي
-            document.getElementById('playerContainer').innerHTML = '<div id="jwplayerDiv"></div>';
-            document.getElementById('jwplayerDiv').className = isExpanded ? 'expanded-video' : 'contained-video';
+            const container = document.getElementById('playerContainer');
+            container.innerHTML = `<div id="jwplayerDiv" class="${isExpanded ? 'expanded-video' : 'contained-video'}"></div>`;
 
             currentPlayer = jwplayer("jwplayerDiv").setup({
                 file: url,
                 width: "100%",
                 height: "100%",
                 autostart: true,
-                stretching: "exactfit", // السماح للكلاسات بالتحكم
-                drm: { 
-                    clearkey: { 
-                        keyId: k1, 
-                        key: k2 
-                    } 
-                }
+                stretching: "exactfit", 
+                drm: { clearkey: { keyId: k1, key: k2 } }
             });
 
             currentPlayer.on('ready', function() {
                 updateExpandButton();
             });
 
-            // اختيار الصوت العربي تلقائياً
             currentPlayer.on('audioTracks', function() {
                 const tracks = currentPlayer.getAudioTracks();
                 tracks.forEach((track, index) => {
@@ -209,50 +202,42 @@
             });
         }
 
-        // دالة تحديث الأيقونة ووظيفة زر التمديد
         function updateExpandButton() {
             currentPlayer.removeButton('expandButton');
             const currentIcon = isExpanded ? iconShrink : iconExpand;
-            const tooltipText = isExpanded ? 'تضييق الفيديو' : 'تمدد الفيديو';
+            const tooltipText = isExpanded ? 'أبعاد أصلية' : 'ملء الشاشة تلقائي';
             
             currentPlayer.addButton(currentIcon, tooltipText, function() {
                 isExpanded = !isExpanded;
-                const container = document.getElementById('jwplayerDiv');
+                const playerDiv = document.getElementById('jwplayerDiv');
                 if(isExpanded) {
-                    container.classList.remove('contained-video');
-                    container.classList.add('expanded-video');
+                    playerDiv.classList.remove('contained-video');
+                    playerDiv.classList.add('expanded-video');
                 } else {
-                    container.classList.remove('expanded-video');
-                    container.classList.add('contained-video');
+                    playerDiv.classList.remove('expanded-video');
+                    playerDiv.classList.add('contained-video');
                 }
-                updateExpandButton(); // تحديث الأيقونة بعد الضغط
+                updateExpandButton();
             }, 'expandButton');
         }
 
-        // وظيفة زر الشاشة الرئيسية (تدمير البث بالكامل)
         document.getElementById('homeBtn').addEventListener('click', () => {
             if (currentPlayer) {
                 currentPlayer.remove();
                 currentPlayer = null;
             }
+            // إزالة التحديد الأزرق عند العودة للرئيسية
+            activeChannelId = null;
+            renderChannels(searchInput.value);
+            
             document.getElementById('playerContainer').classList.add('hidden');
             document.getElementById('homeScreen').classList.remove('hidden');
         });
 
-        // تشغيل البحث
-        searchInput.addEventListener('input', (e) => {
-            renderChannels(e.target.value);
-        });
+        searchInput.addEventListener('input', (e) => renderChannels(e.target.value));
+        window.addEventListener("beforeunload", () => { if(currentPlayer) currentPlayer.remove(); });
+        document.addEventListener("visibilitychange", () => { if (document.hidden && currentPlayer) currentPlayer.pause(); });
 
-        // إيقاف البث عند الخروج من الصفحة أو التبديل لتبويبة أخرى
-        window.addEventListener("beforeunload", function() { if(currentPlayer) currentPlayer.remove(); });
-        document.addEventListener("visibilitychange", function() {
-            if (document.hidden && currentPlayer) { 
-                currentPlayer.pause(); 
-            }
-        });
-
-        // تهيئة قائمة القنوات عند فتح الصفحة
         renderChannels();
     </script>
 </body>
