@@ -15,10 +15,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { background-color: #0f172a; overflow: hidden; margin: 0; }
+        body { background-color: #0f172a; overflow: hidden; margin: 0; padding: 0; }
         
         /* إخفاء أيقونات المشغل التي لا نحتاجها لضمان نظافة الشريط */
         .jw-icon-playlist, .jw-icon-next, .jw-related-btn { display: none !important; }
+
+        /* كود أيقونة ملء الشاشة المربع المتقطع المتغير (من الكود الخاص بك) */
+        .jw-icon-fullscreen svg { display: none !important; }
+        .jw-icon-fullscreen {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTggM0g1YTIgMiAwIDAgMC0yIDJ2M20xOCAwVjVhMiAyIDAgMCAwLTItMmgtM20wIDE4aDNhMiAyIDAgMCAwIDItMnYtM00zIDE2djNhMiAyIDAgMCAwIDIgMmgzIj48L3BhdGg+PC9zdmc+');
+            background-size: 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .jw-flag-fullscreen .jw-icon-fullscreen {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTggM3YzYTIgMiAwIDAgMS0yIDJIM20xOCAwaC0zYTIgMiAwIDAgMS0yLTJWM20wIDE4di0zYTIgMiAwIDAgMSAyLTJoM00zIDE2aDNhMiAyIDAgMCAxIDIgMnYzIj48L3BhdGg+PC9zdmc+');
+        }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -127,7 +139,6 @@
                 const catDiv = document.createElement('div');
                 catDiv.className = 'mb-4';
                 
-                // خط القوائم باللون الأبيض مع إطار أزرق
                 catDiv.innerHTML = `<h3 class="w-full block text-right text-white text-sm font-bold bg-slate-800/80 border border-blue-400/50 py-2 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
@@ -165,31 +176,31 @@
                 currentPlayer = null;
             }
 
-            // إعداد المشغل بالاعتماد الكامل على الطريقة المضمونة للتحكم في الأبعاد
             currentPlayer = jwplayer("jwplayerDiv").setup({
                 file: url,
                 width: "100%",
                 height: "100%",
                 autostart: true,
-                stretching: "uniform", // البداية بالبعد الأصلي
+                stretching: "uniform",
                 drm: { clearkey: { keyId: k1, key: k2 } }
             });
 
             currentPlayer.on('ready', function() {
                 let isStretched = false;
-                
-                // أيقونة الأسهم المتقاطعة (نفس كودك الممتاز)
                 const diagonalCutArrow = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMTBsNy03bS02IDBoNnY2bS0xMSA1bC03IDdtNiAwSDN2LTYiLz48L3N2Zz4=";
                 
-                // إضافة الزر وتغيير وضع stretching داخلياً دون المساس بالـ CSS
                 currentPlayer.addButton(
                     diagonalCutArrow, "توسيع/تضييق الصورة", 
                     function() {
+                        let videoEl = document.querySelector('.jw-video');
                         if (!isStretched) { 
                             currentPlayer.setConfig({ stretching: "exactfit" }); 
+                            // التعديل هنا لضمان تمدد الصورة تلقائياً وإلغاء الحواف السوداء مهما كانت الأبعاد
+                            if(videoEl) { videoEl.style.objectFit = 'fill'; videoEl.style.width = '100%'; videoEl.style.height = '100%'; }
                             isStretched = true; 
                         } else { 
                             currentPlayer.setConfig({ stretching: "uniform" }); 
+                            if(videoEl) { videoEl.style.objectFit = 'contain'; }
                             isStretched = false; 
                         }
                     }, "stretch-button"
