@@ -16,14 +16,9 @@
     
     <style>
         body { background-color: #0f172a; overflow: hidden; margin: 0; }
-        #jwplayerDiv { width: 100% !important; height: 100% !important; }
         
-        /* التحكم التلقائي في الأبعاد لملء الشاشة بالكامل */
-        .expanded-video .jw-video { object-fit: fill !important; width: 100% !important; height: 100% !important; } 
-        .contained-video .jw-video { object-fit: contain !important; }
-        
-        /* إخفاء الأزرار الافتراضية للمشغل لاستبدالها بالأيقونات المخصصة */
-        .jw-icon-fullscreen, .jw-icon-settings, .jw-icon-pip { display: none !important; }
+        /* إخفاء أيقونات المشغل التي لا نحتاجها لضمان نظافة الشريط */
+        .jw-icon-playlist, .jw-icon-next, .jw-related-btn { display: none !important; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -51,7 +46,7 @@
     <!-- Main Content / منطقة الفيديو -->
     <div class="flex-1 h-full relative" style="margin-left: 18rem;">
         
-        <!-- الشاشة الرئيسية (خلفية استاد احترافية) -->
+        <!-- الشاشة الرئيسية -->
         <div id="homeScreen" class="absolute inset-0 z-10 bg-black flex flex-col items-center justify-center">
             <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000&auto=format&fit=crop" alt="Stadium Background" class="w-full h-full object-cover opacity-30">
             <div class="absolute text-center bg-slate-900/70 p-10 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
@@ -63,7 +58,7 @@
 
         <!-- المشغل -->
         <div id="playerContainer" class="w-full h-full hidden z-20 absolute inset-0 bg-black">
-            <div id="jwplayerDiv" class="expanded-video"></div>
+            <div id="jwplayerDiv" style="width: 100%; height: 100%;"></div>
         </div>
     </div>
 
@@ -85,7 +80,7 @@
             };
         })();
 
-        // قاعدة البيانات الكاملة (لم يتم مسح أي شيء)
+        // قاعدة البيانات الكاملة للقنوات
         const channelsData = {
             "قنوات ثمانية": [
                 { id: "thamanya1", name: "ثمانية 1", url: "https://scccrwb-live.cdn.intigral-ott.net/bpk-tv/STCT1/wv-pr/manifest.mpd174e90a58a1f2c024be4c9/cenc.mpd", k1: "714c789c76686632652eefc19f18c3db", k2: "962cee49ee9422b44a6c60a7999854ad" },
@@ -121,14 +116,7 @@
         const channelListContainer = document.getElementById('channelListContainer');
         const searchInput = document.getElementById('searchInput');
         let currentPlayer = null;
-        let isExpanded = true; 
         let activeChannelId = null;
-
-        // الأيقونات بصيغة صور Data URI المشفرة (Base64) ليقرأها المشغل بنجاح
-        const iconExpandShrink = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNMTAgMjF2LTJINi40MWw0LjUtNC41LTEuNDEtMS40MS00LjUgNC41VjE0SDN2N2g3em0xMS03aC0ydjMuNTlsLTQuNS00LjUtMS40MSAxLjQxIDQuNSA0LjVIMTR2Mmg3di03ek0zIDEwaDJWNi40MWw0LjUgNC41IDEuNDEtMS40MS00LjUtNC41SDEwVjNIM3Y3em0xNC41LTIuNUwxMyAxMi4wOWwxLjQxIDEuNDEgNC41LTQuNVYxMGgyVjNoLTd2MmgzLjU5eiIvPjwvc3ZnPg==';
-        const iconPiP = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNMjEgM0gzYy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE4YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6bTAgMTZIM1Y1aDE4djE0em0tMTAtN2g3djVoLTd2LTV6Ii8+PC9zdmc+';
-        const iconSettings = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNMTkuMTQgMTIuOTRjLjA0LS4zLjA2LS42MS4wNi0uOTQgMC0uMzItLjAyLS42NC0uMDYtLjk0bDIuMDMtMS41OGMuMTgtLjE0LjIzLS40MS4xMi0uNjFsLTEuOTItMy4zMmMtLjEyLS4yMi0uMzctLjI5LS41OS0uMjJsLTIuMzkuOTRjLS41LS4zOC0xLjAzLS43LTEuNjItLjk0bC0yLjM5LS40OGMtLjA1LS4yNC0uMjQtLjQxLS40OC0uNDFoLTMuODRjLS4yNCAwLS40My4xNy0uNDcuNDFsLS4zNiAyLjU0Yy0uNTkuMjQtMS4xMy41Ni0xLjYyLjk0bC0yLjM5LS45NGMtLjIyLS4wOC0uNDcgMC0uNTkuMjJsLTEuOTIgMy4zMmMtLjEyLjIyLS4wNy40OS4xMi42MWwyLjAzIDEuNThjLS4wNS4zLS4wOS42My0uMDkuOTRzLjAyLjY0LjA2Ljk0bC0yLjAzIDEuNThjLS4xOC4xNC0uMjMuNDEtLjEyLjYxbDEuOTIgMy4zMmMuMTIuMjIuMzcuMjkuNTkuMjJsMi4zOS0uOTZjLjUuMzggMS4wMy43IDEuNjIuOTRsLjM2IDIuNTRjLjA1LjI0LjI0LjQxLjQ4LjQxaDMuODRjLjI0IDAgLjQ0LS4xNy40Ny0uNDFsLjM2LTIuNTRjLjU5LS4yNCAxLjEzLS41NiAxLjYyLS45NGwyLjM5Ljk2Yy4yMi4wOC40NyAwIC41OS0uMjJsMS45Mi0zLjMyYy4xMi0uMjIuMDctLjQ5LS4xMi0uNjFsLTIuMDEtMS41OHpNMTIgMTUuNmMtMS45OCAwLTMuNi0xLjYyLTMuNi0zLjZzMS42Mi0zLjYgMy42LTMuNiAzLjYgMS42MiAzLjYgMy42LTEuNjIgMy42LTMuNiAzLjZ6Ii8+PC9zdmc+';
-        const iconFullscreen = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4Ij48cGF0aCBkPSJNNyAxNEg1djVoNXYtMkg3di0zem0tMi00aDJWN2gzVjVINXY1em0xMiA3aC0zdjJoNXYtNWgtMnYzek0xNCA1djJoM3YzaDJWNWgtNXoiLz48L3N2Zz4=';
 
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
@@ -139,7 +127,7 @@
                 const catDiv = document.createElement('div');
                 catDiv.className = 'mb-4';
                 
-                // خط القوائم الرئيسية باللون الأبيض والمربع الأزرق
+                // خط القوائم باللون الأبيض مع إطار أزرق
                 catDiv.innerHTML = `<h3 class="w-full block text-right text-white text-sm font-bold bg-slate-800/80 border border-blue-400/50 py-2 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
@@ -172,22 +160,40 @@
             document.getElementById('homeScreen').classList.add('hidden');
             document.getElementById('playerContainer').classList.remove('hidden');
             
-            if (currentPlayer) currentPlayer.remove();
+            if (currentPlayer) {
+                currentPlayer.remove();
+                currentPlayer = null;
+            }
 
-            const container = document.getElementById('playerContainer');
-            container.innerHTML = `<div id="jwplayerDiv" class="${isExpanded ? 'expanded-video' : 'contained-video'}"></div>`;
-
+            // إعداد المشغل بالاعتماد الكامل على الطريقة المضمونة للتحكم في الأبعاد
             currentPlayer = jwplayer("jwplayerDiv").setup({
                 file: url,
                 width: "100%",
                 height: "100%",
                 autostart: true,
-                stretching: "exactfit", 
+                stretching: "uniform", // البداية بالبعد الأصلي
                 drm: { clearkey: { keyId: k1, key: k2 } }
             });
 
             currentPlayer.on('ready', function() {
-                addCustomButtons();
+                let isStretched = false;
+                
+                // أيقونة الأسهم المتقاطعة (نفس كودك الممتاز)
+                const diagonalCutArrow = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMTBsNy03bS02IDBoNnY2bS0xMSA1bC03IDdtNiAwSDN2LTYiLz48L3N2Zz4=";
+                
+                // إضافة الزر وتغيير وضع stretching داخلياً دون المساس بالـ CSS
+                currentPlayer.addButton(
+                    diagonalCutArrow, "توسيع/تضييق الصورة", 
+                    function() {
+                        if (!isStretched) { 
+                            currentPlayer.setConfig({ stretching: "exactfit" }); 
+                            isStretched = true; 
+                        } else { 
+                            currentPlayer.setConfig({ stretching: "uniform" }); 
+                            isStretched = false; 
+                        }
+                    }, "stretch-button"
+                );
             });
             
             currentPlayer.on('audioTracks', function() {
@@ -198,48 +204,6 @@
                     }
                 });
             });
-        }
-
-        function addCustomButtons() {
-            // إضافة الأزرار المخصصة التي تم تحويلها لصور بنفس الترتيب
-            
-            // 1. زر توسيع وتضييق الشاشة
-            currentPlayer.addButton(iconExpandShrink, 'تغيير أبعاد الصورة', function() {
-                isExpanded = !isExpanded;
-                const playerDiv = document.getElementById('jwplayerDiv');
-                if(isExpanded) {
-                    playerDiv.classList.remove('contained-video');
-                    playerDiv.classList.add('expanded-video');
-                } else {
-                    playerDiv.classList.remove('expanded-video');
-                    playerDiv.classList.add('contained-video');
-                }
-            }, 'customExpandBtn');
-
-            // 2. زر الإعدادات
-            currentPlayer.addButton(iconSettings, 'الإعدادات', function() {
-                const settingsMenu = document.querySelector('.jw-settings-menu');
-                if(settingsMenu) {
-                    settingsMenu.style.display = settingsMenu.style.display === 'none' || settingsMenu.style.display === '' ? 'block' : 'none';
-                }
-            }, 'customSettingsBtn');
-
-            // 3. زر صورة داخل صورة
-            currentPlayer.addButton(iconPiP, 'صورة داخل صورة', function() {
-                const video = document.querySelector('video');
-                if (video && typeof video.requestPictureInPicture === 'function') {
-                    if (document.pictureInPictureElement) {
-                        document.exitPictureInPicture();
-                    } else {
-                        video.requestPictureInPicture();
-                    }
-                }
-            }, 'customPipBtn');
-
-            // 4. زر ملء الشاشة
-            currentPlayer.addButton(iconFullscreen, 'ملء الشاشة', function() {
-                currentPlayer.setFullscreen(!currentPlayer.getFullscreen());
-            }, 'customFullscreenBtn');
         }
 
         document.getElementById('homeBtn').addEventListener('click', () => {
