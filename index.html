@@ -22,9 +22,6 @@
         .expanded-video .jw-video { object-fit: fill !important; width: 100% !important; height: 100% !important; } 
         .contained-video .jw-video { object-fit: contain !important; }
         
-        /* إخفاء أزرار JWPlayer الافتراضية التي سنستبدلها */
-        .jw-button-color.jw-toggle-fullscreen, .jw-settings-submenu-button { display: none !important; }
-
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
@@ -86,7 +83,7 @@
             };
         })();
 
-        // قاعدة البيانات (تم إرجاع جميع القنوات كما هي)
+        // قاعدة البيانات الكاملة كما هي دون أي مسح
         const channelsData = {
             "قنوات ثمانية": [
                 { id: "thamanya1", name: "ثمانية 1", url: "https://scccrwb-live.cdn.intigral-ott.net/bpk-tv/STCT1/wv-pr/manifest.mpd174e90a58a1f2c024be4c9/cenc.mpd", k1: "714c789c76686632652eefc19f18c3db", k2: "962cee49ee9422b44a6c60a7999854ad" },
@@ -125,11 +122,8 @@
         let isExpanded = true; 
         let activeChannelId = null;
 
-        // أيقونات مخصصة مطابقة للصورة المطلوبة قدر الإمكان
-        const iconExpandShrink = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7zm11-7h-2v3.59l-4.5-4.5-1.41 1.41 4.5 4.5H14v2h7v-7zM3 10h2V6.41l4.5 4.5 1.41-1.41-4.5-4.5H10V3H3v7zm14.5-2.5L13 12.09l1.41 1.41 4.5-4.5V10h2V3h-7v2h3.59z"/></svg>`;
-        const iconSettings = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>`;
-        const iconPiP = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg>`;
-        const iconFullscreen = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`;
+        // أيقونة التوسيع/التضييق (الأسهم المتقاطعة) ليتم إضافتها بجوار الأزرار الأساسية
+        const iconExpandShrink = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
@@ -140,8 +134,8 @@
                 const catDiv = document.createElement('div');
                 catDiv.className = 'mb-4';
                 
-                // مربع أزرق خفيف حول الاسم فقط
-                catDiv.innerHTML = `<div class="mb-2"><span class="text-blue-200 text-sm font-bold bg-blue-900/30 border border-blue-400/50 py-1 px-3 rounded inline-block">${category}</span></div>`;
+                // المربع هنا بعرضه الكامل (نفس الأبعاد الأصلية) مع إضافة الإطار الأزرق الخفيف
+                catDiv.innerHTML = `<h3 class="w-full block text-right text-blue-200 text-sm font-bold bg-slate-800/80 border border-blue-400/50 py-2 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
                 ul.className = 'space-y-1';
@@ -149,7 +143,6 @@
                 filteredChannels.forEach(ch => {
                     const li = document.createElement('li');
                     const isActive = activeChannelId === ch.id;
-                    // لون أزرق ثابت خفيف للقناة المختارة
                     const bgClass = isActive ? 'bg-[#1e3a8a] border-r-4 border-blue-400 text-blue-50 font-bold' : 'text-gray-300 hover:bg-slate-700 hover:text-white border-r-4 border-transparent';
                     
                     li.innerHTML = `
@@ -189,7 +182,7 @@
             });
 
             currentPlayer.on('ready', function() {
-                addCustomButtons();
+                addCustomExpandButton();
             });
             
             currentPlayer.on('audioTracks', function() {
@@ -202,16 +195,10 @@
             });
         }
 
-        function addCustomButtons() {
-            // إزالة الأزرار إن وجدت مسبقاً لمنع التكرار
+        function addCustomExpandButton() {
             currentPlayer.removeButton('expandButton');
-            currentPlayer.removeButton('settingsBtn');
-            currentPlayer.removeButton('pipBtn');
-            currentPlayer.removeButton('fullscreenBtn');
 
-            // ترتيب الأزرار ليتطابق مع الصورة (يمين الشاشة)
-            
-            // 1. زر التوسيع والتضييق (الأسهم المتقاطعة)
+            // إضافة زر توسيع الصورة فقط (الإعدادات وصورة داخل صورة وملء الشاشة تظهر بشكلها الافتراضي الممتاز في JWPlayer)
             currentPlayer.addButton(iconExpandShrink, 'تغيير أبعاد الصورة', function() {
                 isExpanded = !isExpanded;
                 const playerDiv = document.getElementById('jwplayerDiv');
@@ -223,30 +210,6 @@
                     playerDiv.classList.add('contained-video');
                 }
             }, 'expandButton');
-
-            // 2. زر الإعدادات
-            currentPlayer.addButton(iconSettings, 'الإعدادات', function() {
-                // تفعيل قائمة إعدادات JWPlayer الافتراضية
-                const settingsMenu = document.querySelector('.jw-settings-menu');
-                if(settingsMenu) settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
-            }, 'settingsBtn');
-
-            // 3. زر صورة داخل صورة
-            currentPlayer.addButton(iconPiP, 'صورة داخل صورة', function() {
-                const video = document.querySelector('video');
-                if (video && typeof video.requestPictureInPicture === 'function') {
-                    if (document.pictureInPictureElement) {
-                        document.exitPictureInPicture();
-                    } else {
-                        video.requestPictureInPicture();
-                    }
-                }
-            }, 'pipBtn');
-
-            // 4. زر ملء الشاشة
-            currentPlayer.addButton(iconFullscreen, 'ملء الشاشة', function() {
-                currentPlayer.setFullscreen(!currentPlayer.getFullscreen());
-            }, 'fullscreenBtn');
         }
 
         document.getElementById('homeBtn').addEventListener('click', () => {
