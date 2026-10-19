@@ -18,7 +18,7 @@
         body { background-color: #0f172a; overflow: hidden; margin: 0; }
         #jwplayerDiv { width: 100% !important; height: 100% !important; }
         
-        /* التمدد التلقائي للشاشة 720p وغيرها */
+        /* التمدد التلقائي للشاشة 720p وغيرها لملء المساحة بالكامل */
         .expanded-video video { 
             object-fit: fill !important; 
             width: 100% !important; 
@@ -119,9 +119,7 @@
         let isExpanded = true; 
         let activeChannelId = null;
 
-        const iconExpand = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7zm11-7h-2v3.59l-4.5-4.5 1.41-1.41 4.5 4.5V10h2v7zM3 10h2V6.41l4.5 4.5 1.41-1.41-4.5-4.5H10V3H3v7zm18-7h-7v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V10h2V3z"/></svg>`;
-        const iconShrink = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6 z"/></svg>`;
-
+        // الاعتماد بالكامل على أيقونات JWPlayer الأصلية تماماً بدون أي تعديل خارجي مخصص للأيقونات
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
             for (const [category, channels] of Object.entries(channelsData)) {
@@ -131,7 +129,7 @@
                 const catDiv = document.createElement('div');
                 catDiv.className = 'mb-4';
                 
-                // المربعات حول أسماء الأقسام كما كانت تماماً
+                // المربعات حول أسماء الأقسام كما طلبت تماماً
                 catDiv.innerHTML = `<h3 class="text-blue-200 text-sm font-bold bg-slate-800 border border-blue-400/40 py-1.5 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
@@ -184,7 +182,7 @@
             });
 
             currentPlayer.on('ready', function() {
-                updateExpandButton();
+                // استخدام أزرار المشغل الافتراضية الأصلية بالكامل
             });
 
             currentPlayer.on('audioTracks', function() {
@@ -195,25 +193,6 @@
                     }
                 });
             });
-        }
-
-        function updateExpandButton() {
-            currentPlayer.removeButton('expandButton');
-            const currentIcon = isExpanded ? iconShrink : iconExpand;
-            const tooltipText = isExpanded ? 'أبعاد أصلية' : 'تمدد تلقائي لملء الشاشة';
-            
-            currentPlayer.addButton(currentIcon, tooltipText, function() {
-                isExpanded = !isExpanded;
-                const playerDiv = document.getElementById('jwplayerDiv');
-                if(isExpanded) {
-                    playerDiv.classList.remove('contained-video');
-                    playerDiv.classList.add('expanded-video');
-                } else {
-                    playerDiv.classList.remove('expanded-video');
-                    playerDiv.classList.add('contained-video');
-                }
-                updateExpandButton();
-            }, 'expandButton');
         }
 
         document.getElementById('homeBtn').addEventListener('click', () => {
