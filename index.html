@@ -18,16 +18,13 @@
         body { background-color: #0f172a; overflow: hidden; margin: 0; }
         #jwplayerDiv { width: 100% !important; height: 100% !important; }
         
-        /* التمدد التلقائي للشاشة 720p وغيرها لملء المساحة بالكامل */
-        .expanded-video video { 
-            object-fit: fill !important; 
-            width: 100% !important; 
-            height: 100% !important; 
-        } 
-        .contained-video video { 
-            object-fit: contain !important; 
-        }
+        /* التحكم التلقائي في الأبعاد لملء الشاشة بالكامل */
+        .expanded-video .jw-video { object-fit: fill !important; width: 100% !important; height: 100% !important; } 
+        .contained-video .jw-video { object-fit: contain !important; }
         
+        /* إخفاء أزرار JWPlayer الافتراضية التي سنستبدلها */
+        .jw-button-color.jw-toggle-fullscreen, .jw-settings-submenu-button { display: none !important; }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
@@ -38,19 +35,17 @@
     <!-- Sidebar / قائمة القنوات -->
     <div class="w-72 bg-slate-900 h-full flex flex-col fixed left-0 top-0 border-r border-slate-800 z-50 shadow-xl">
         
-        <!-- Header: البحث على اليمين وزر الرئيسية على اليسار -->
         <div class="p-4 bg-slate-800 flex items-center gap-3 border-b border-slate-700">
             <div class="relative flex-1">
-                <input type="text" id="searchInput" placeholder="ابحث عن قناة..." class="w-full bg-slate-700 text-white px-3 py-2 pr-9 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400">
+                <input type="text" id="searchInput" placeholder="ابحث عن قناة..." class="w-full bg-slate-700 text-white px-3 py-2 pr-9 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400 transition shadow-inner">
                 <i class="fa-solid fa-search absolute right-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            <button id="homeBtn" class="bg-slate-700 hover:bg-blue-600 text-white p-2 rounded transition flex-shrink-0" title="الشاشة الرئيسية / إغلاق البث">
+            <button id="homeBtn" class="bg-slate-700 hover:bg-blue-600 text-white p-2 rounded transition flex-shrink-0 shadow-md" title="الشاشة الرئيسية / إغلاق البث">
                 <i class="fa-solid fa-house"></i>
             </button>
         </div>
 
-        <!-- القنوات -->
-        <div class="flex-1 overflow-y-auto p-4" id="channelListContainer"></div>
+        <div class="flex-1 overflow-y-auto p-3" id="channelListContainer"></div>
     </div>
 
     <!-- Main Content / منطقة الفيديو -->
@@ -58,9 +53,11 @@
         
         <!-- الشاشة الرئيسية -->
         <div id="homeScreen" class="absolute inset-0 z-10 bg-black flex flex-col items-center justify-center">
-            <img src="https://images.unsplash.com/photo-1542204637-e11b02130e58?q=80&w=2070&auto=format&fit=crop" alt="TV Background 8" class="w-full h-full object-cover opacity-60">
-            <div class="absolute text-center bg-slate-900/80 p-8 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
-                <h1 class="text-6xl font-bold mb-4 text-blue-500 drop-shadow-lg tracking-wider">sc8tv</h1>
+            <!-- صورة رقم 8 -->
+            <img src="https://images.unsplash.com/photo-1549294413-26f195200c16?q=80&w=2000&auto=format&fit=crop" alt="TV Background Number 8" class="w-full h-full object-cover opacity-30">
+            <div class="absolute text-center bg-slate-900/70 p-10 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
+                <i class="fa-solid fa-tv text-6xl text-blue-500 mb-4"></i>
+                <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg tracking-wide">sc8tv</h1>
                 <p class="text-lg text-gray-300 drop-shadow-md">اختر قناة من القائمة الجانبية لبدء المشاهدة</p>
             </div>
         </div>
@@ -72,7 +69,7 @@
     </div>
 
     <script>
-        // تزوير الهوية (User-Agent) للسيرفر
+        // تزوير الهوية
         (function() {
             var originalFetch = window.fetch;
             var originalXHR = window.XMLHttpRequest;
@@ -89,7 +86,7 @@
             };
         })();
 
-        // قاعدة البيانات
+        // قاعدة البيانات (تم إرجاع جميع القنوات كما هي)
         const channelsData = {
             "قنوات ثمانية": [
                 { id: "thamanya1", name: "ثمانية 1", url: "https://scccrwb-live.cdn.intigral-ott.net/bpk-tv/STCT1/wv-pr/manifest.mpd174e90a58a1f2c024be4c9/cenc.mpd", k1: "714c789c76686632652eefc19f18c3db", k2: "962cee49ee9422b44a6c60a7999854ad" },
@@ -110,6 +107,15 @@
                 { id: "art-cinema", name: "ART سينما", url: "https://ev-fast-mpd.starzplayarabia.com/live/eds/ART_Cinema/DASH/ART_Cinema.mpd", k1: "bd484fc91dcf152010a0e367e15ab60e", k2: "d9bed0a77b7da410129820bcc6606670" },
                 { id: "art-hekayat1", name: "ART حكايات 1", url: "https://ev-fast-mpd.starzplayarabia.com/live/eds/ART_Hekayat/DASH/ART_Hekayat.mpd", k1: "3d614bb04140eda383d117fb55e9a361", k2: "b669cdf2cb65eff56d1e3534c7a54b53" },
                 { id: "art-hekayat2", name: "ART حكايات 2", url: "https://ev-fast-mpd.starzplayarabia.com/live/eds/ART_Hekayat_2/DASH/ART_Hekayat_2.mpd", k1: "4ccb01903d6868e27953ff0298d4ac05", k2: "d156518d6ab453d9f9d12c243280be8f" }
+            ],
+            "قنوات منوعة": [
+                { id: "mbc-action", name: "MBC Action", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-action/8ea6ca1108d03e03da5e61372354f5c8/index.mpd", k1: "e3ce77324a3d4fa2a913b26cc1976052", k2: "17774f82a3b9e33ea7a149596acbb20f" },
+                { id: "mbc-masr-2", name: "MBC Masr 2", url: "https://shd-mediacdn-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/7eaa7c0393e9a9637ae311aac75eb40e/index.mpd", k1: "e3ce77324a3d4fa2a913b26cc1976052", k2: "17774f82a3b9e33ea7a149596acbb20f" },
+                { id: "Sport_2SK", name: "Sport 2 SK", url: "https://dash2.antik.sk/stream/nvidia_sport2/playlist_cenc.mpd", k1: "11223344556677889900112233445566", k2: "4b80724d0ef86bcb2c21f7999d67739d" },
+                { id: "ZIGGO_1", name: "ZIGGO 1", url: "https://mag04.tvx.prd.tv.odido.nl/wh7f454c46tw75168188_-627298088/PLTV/86/224/3221241590/3221241590.mpd?accountinfo=~~V2.0~qbcsJh_jU5C9BcZc959e_wae44b4867b3417aa76b5db2da20fe46c~KZzTWjB8qD1zdgbJjRPVLJX-tV0qiN9RBHC_iseGrsmTSRjj06oGDtGlpSCRGOwF3626cf085c08d024c7e4aafc18c32440:UTC,", k1: "ef34ae91b4f2415e8439b2ad105e7488", k2: "243248d8de1ff8c7c587ee2057317523" },
+                { id: "Fubo_Sports_2", name: "Fubo Sports 2", url: "https://otte.live.fly.ww.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/uiffe4jhf0/out/v1/3534efafca8c4815adbb4d2e9a1fe003/cenc.mpd", k1: "3dcfbec0e7146928baa55210bf2cb62f", k2: "bc85f74f815d9be5ae1dd6defaa05135" },
+                { id: "Premier_League", name: "Premier League", url: "https://otte.live.fly.ww.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/uiffe4jhf0/out/v1/3534efafca8c4815adbb4d2e9a1fe003/cenc.mpd", k1: "3dcfbec0e7146928baa55210bf2cb62f", k2: "bc85f74f815d9be5ae1dd6defaa05135" },
+                { id: "Матч!_1", name: "Матч! 1", url: "https://video.beeline.tv/live/d/channel319.isml/manifest-stb.mpd", k1: "ce7cf9b28d1a8d874accebc44d7e1fcd", k2: "cda18d4d20abd5cc778315abe277feb9" }
             ]
         };
 
@@ -119,7 +125,12 @@
         let isExpanded = true; 
         let activeChannelId = null;
 
-        // الاعتماد بالكامل على أيقونات JWPlayer الأصلية تماماً بدون أي تعديل خارجي مخصص للأيقونات
+        // أيقونات مخصصة مطابقة للصورة المطلوبة قدر الإمكان
+        const iconExpandShrink = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7zm11-7h-2v3.59l-4.5-4.5-1.41 1.41 4.5 4.5H14v2h7v-7zM3 10h2V6.41l4.5 4.5 1.41-1.41-4.5-4.5H10V3H3v7zm14.5-2.5L13 12.09l1.41 1.41 4.5-4.5V10h2V3h-7v2h3.59z"/></svg>`;
+        const iconSettings = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>`;
+        const iconPiP = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg>`;
+        const iconFullscreen = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`;
+
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
             for (const [category, channels] of Object.entries(channelsData)) {
@@ -129,23 +140,23 @@
                 const catDiv = document.createElement('div');
                 catDiv.className = 'mb-4';
                 
-                // المربعات حول أسماء الأقسام كما طلبت تماماً
-                catDiv.innerHTML = `<h3 class="text-blue-200 text-sm font-bold bg-slate-800 border border-blue-400/40 py-1.5 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
+                // مربع أزرق خفيف حول الاسم فقط
+                catDiv.innerHTML = `<div class="mb-2"><span class="text-blue-200 text-sm font-bold bg-blue-900/30 border border-blue-400/50 py-1 px-3 rounded inline-block">${category}</span></div>`;
                 
                 const ul = document.createElement('ul');
                 ul.className = 'space-y-1';
                 
                 filteredChannels.forEach(ch => {
                     const li = document.createElement('li');
-                    
                     const isActive = activeChannelId === ch.id;
-                    const bgClass = isActive ? 'bg-blue-600/80 text-white font-semibold' : 'text-gray-300 hover:bg-slate-700/80 hover:text-white';
+                    // لون أزرق ثابت خفيف للقناة المختارة
+                    const bgClass = isActive ? 'bg-[#1e3a8a] border-r-4 border-blue-400 text-blue-50 font-bold' : 'text-gray-300 hover:bg-slate-700 hover:text-white border-r-4 border-transparent';
                     
                     li.innerHTML = `
                         <button onclick="playChannel('${ch.id}', '${ch.url}', '${ch.k1}', '${ch.k2}')" 
-                            class="w-full text-right px-3 py-2 text-sm rounded transition flex justify-between items-center group ${bgClass}">
+                            class="w-full text-right px-3 py-2.5 text-sm rounded transition flex justify-between items-center group ${bgClass}">
                             <span>${ch.name}</span>
-                            <i class="fa-solid fa-play text-xs ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition"></i>
+                            <i class="fa-solid fa-play text-xs ${isActive ? 'opacity-100 text-blue-200' : 'opacity-0 group-hover:opacity-100'} transition"></i>
                         </button>
                     `;
                     ul.appendChild(li);
@@ -153,10 +164,6 @@
                 
                 catDiv.appendChild(ul);
                 channelListContainer.appendChild(catDiv);
-            }
-            
-            if (channelListContainer.innerHTML === '') {
-                channelListContainer.innerHTML = '<div class="text-gray-500 text-center mt-10 text-sm">لا توجد قنوات مطابقة</div>';
             }
         }
 
@@ -177,14 +184,14 @@
                 width: "100%",
                 height: "100%",
                 autostart: true,
-                stretching: "exactfit",
+                stretching: "exactfit", 
                 drm: { clearkey: { keyId: k1, key: k2 } }
             });
 
             currentPlayer.on('ready', function() {
-                // استخدام أزرار المشغل الافتراضية الأصلية بالكامل
+                addCustomButtons();
             });
-
+            
             currentPlayer.on('audioTracks', function() {
                 const tracks = currentPlayer.getAudioTracks();
                 tracks.forEach((track, index) => {
@@ -195,14 +202,57 @@
             });
         }
 
+        function addCustomButtons() {
+            // إزالة الأزرار إن وجدت مسبقاً لمنع التكرار
+            currentPlayer.removeButton('expandButton');
+            currentPlayer.removeButton('settingsBtn');
+            currentPlayer.removeButton('pipBtn');
+            currentPlayer.removeButton('fullscreenBtn');
+
+            // ترتيب الأزرار ليتطابق مع الصورة (يمين الشاشة)
+            
+            // 1. زر التوسيع والتضييق (الأسهم المتقاطعة)
+            currentPlayer.addButton(iconExpandShrink, 'تغيير أبعاد الصورة', function() {
+                isExpanded = !isExpanded;
+                const playerDiv = document.getElementById('jwplayerDiv');
+                if(isExpanded) {
+                    playerDiv.classList.remove('contained-video');
+                    playerDiv.classList.add('expanded-video');
+                } else {
+                    playerDiv.classList.remove('expanded-video');
+                    playerDiv.classList.add('contained-video');
+                }
+            }, 'expandButton');
+
+            // 2. زر الإعدادات
+            currentPlayer.addButton(iconSettings, 'الإعدادات', function() {
+                // تفعيل قائمة إعدادات JWPlayer الافتراضية
+                const settingsMenu = document.querySelector('.jw-settings-menu');
+                if(settingsMenu) settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
+            }, 'settingsBtn');
+
+            // 3. زر صورة داخل صورة
+            currentPlayer.addButton(iconPiP, 'صورة داخل صورة', function() {
+                const video = document.querySelector('video');
+                if (video && typeof video.requestPictureInPicture === 'function') {
+                    if (document.pictureInPictureElement) {
+                        document.exitPictureInPicture();
+                    } else {
+                        video.requestPictureInPicture();
+                    }
+                }
+            }, 'pipBtn');
+
+            // 4. زر ملء الشاشة
+            currentPlayer.addButton(iconFullscreen, 'ملء الشاشة', function() {
+                currentPlayer.setFullscreen(!currentPlayer.getFullscreen());
+            }, 'fullscreenBtn');
+        }
+
         document.getElementById('homeBtn').addEventListener('click', () => {
-            if (currentPlayer) {
-                currentPlayer.remove();
-                currentPlayer = null;
-            }
+            if (currentPlayer) { currentPlayer.remove(); currentPlayer = null; }
             activeChannelId = null;
             renderChannels(searchInput.value);
-            
             document.getElementById('playerContainer').classList.add('hidden');
             document.getElementById('homeScreen').classList.remove('hidden');
         });
