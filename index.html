@@ -50,8 +50,8 @@
         
         <!-- الشاشة الرئيسية -->
         <div id="homeScreen" class="absolute inset-0 z-10 bg-black flex flex-col items-center justify-center">
-            <!-- صورة رقم 8 -->
-            <img src="https://images.unsplash.com/photo-1549294413-26f195200c16?q=80&w=2000&auto=format&fit=crop" alt="TV Background Number 8" class="w-full h-full object-cover opacity-30">
+            <!-- صورة استاد كرة قدم احترافية -->
+            <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000&auto=format&fit=crop" alt="Stadium Background" class="w-full h-full object-cover opacity-30">
             <div class="absolute text-center bg-slate-900/70 p-10 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
                 <i class="fa-solid fa-tv text-6xl text-blue-500 mb-4"></i>
                 <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg tracking-wide">sc8tv</h1>
@@ -83,7 +83,7 @@
             };
         })();
 
-        // قاعدة البيانات الكاملة كما هي دون أي مسح
+        // قاعدة البيانات الكاملة كما هي دون مسح
         const channelsData = {
             "قنوات ثمانية": [
                 { id: "thamanya1", name: "ثمانية 1", url: "https://scccrwb-live.cdn.intigral-ott.net/bpk-tv/STCT1/wv-pr/manifest.mpd174e90a58a1f2c024be4c9/cenc.mpd", k1: "714c789c76686632652eefc19f18c3db", k2: "962cee49ee9422b44a6c60a7999854ad" },
@@ -122,8 +122,8 @@
         let isExpanded = true; 
         let activeChannelId = null;
 
-        // أيقونة التوسيع/التضييق (الأسهم المتقاطعة) ليتم إضافتها بجوار الأزرار الأساسية
-        const iconExpandShrink = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        // أيقونة التوسيع والتضييق التي ستضاف بجوار أزرار الإعدادات الأصلية
+        const iconExpandShrink = `<svg viewBox="0 0 24 24" fill="white" width="20px" height="20px"><path d="M19 5h-4l3 3-4 4 1.41 1.41 4-4 3 3V5h-7zm-14 14h4l-3-3 4-4-1.41-1.41-4 4-3-3v7h7z"/></svg>`;
 
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
@@ -134,8 +134,8 @@
                 const catDiv = document.createElement('div');
                 catDiv.className = 'mb-4';
                 
-                // المربع هنا بعرضه الكامل (نفس الأبعاد الأصلية) مع إضافة الإطار الأزرق الخفيف
-                catDiv.innerHTML = `<h3 class="w-full block text-right text-blue-200 text-sm font-bold bg-slate-800/80 border border-blue-400/50 py-2 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
+                // تم تعديل لون الخط ليكون أبيض (text-white) مع الاحتفاظ بالمربع الأزرق
+                catDiv.innerHTML = `<h3 class="w-full block text-right text-white text-sm font-bold bg-slate-800/80 border border-blue-400/50 py-2 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
                 ul.className = 'space-y-1';
@@ -172,6 +172,7 @@
             const container = document.getElementById('playerContainer');
             container.innerHTML = `<div id="jwplayerDiv" class="${isExpanded ? 'expanded-video' : 'contained-video'}"></div>`;
 
+            // سيتم استخدام أزرار الإعدادات وصورة داخل صورة وملء الشاشة الافتراضية الخاصة بـ JWPlayer لضمان وظيفتها الأصلية
             currentPlayer = jwplayer("jwplayerDiv").setup({
                 file: url,
                 width: "100%",
@@ -198,7 +199,7 @@
         function addCustomExpandButton() {
             currentPlayer.removeButton('expandButton');
 
-            // إضافة زر توسيع الصورة فقط (الإعدادات وصورة داخل صورة وملء الشاشة تظهر بشكلها الافتراضي الممتاز في JWPlayer)
+            // إضافة زر توسيع/تضييق الصورة بجوار الأزرار الأصلية
             currentPlayer.addButton(iconExpandShrink, 'تغيير أبعاد الصورة', function() {
                 isExpanded = !isExpanded;
                 const playerDiv = document.getElementById('jwplayerDiv');
