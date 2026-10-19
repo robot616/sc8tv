@@ -18,17 +18,16 @@
         body { background-color: #0f172a; overflow: hidden; margin: 0; }
         #jwplayerDiv { width: 100% !important; height: 100% !important; }
         
-        /* التحكم التلقائي لأبعاد الشاشة 720p وأي شاشة أخرى */
+        /* التمدد التلقائي للشاشة 720p وغيرها */
         .expanded-video video { 
-            object-fit: fill !important; /* إجبار الصورة على التمدد لكل الحواف */
+            object-fit: fill !important; 
             width: 100% !important; 
             height: 100% !important; 
         } 
         .contained-video video { 
-            object-fit: contain !important; /* الحفاظ على الأبعاد الأصلية */
+            object-fit: contain !important; 
         }
         
-        /* تجميل شريط التمرير للقنوات */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
@@ -39,7 +38,7 @@
     <!-- Sidebar / قائمة القنوات -->
     <div class="w-72 bg-slate-900 h-full flex flex-col fixed left-0 top-0 border-r border-slate-800 z-50 shadow-xl">
         
-        <!-- Header: زر الرئيسية على اليسار ثم البحث -->
+        <!-- Header: البحث على اليمين وزر الرئيسية على اليسار -->
         <div class="p-4 bg-slate-800 flex items-center gap-3 border-b border-slate-700">
             <div class="relative flex-1">
                 <input type="text" id="searchInput" placeholder="ابحث عن قناة..." class="w-full bg-slate-700 text-white px-3 py-2 pr-9 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400">
@@ -57,9 +56,8 @@
     <!-- Main Content / منطقة الفيديو -->
     <div class="flex-1 h-full relative" style="margin-left: 18rem;">
         
-        <!-- الشاشة الرئيسية (صورة رقم 8) -->
+        <!-- الشاشة الرئيسية -->
         <div id="homeScreen" class="absolute inset-0 z-10 bg-black flex flex-col items-center justify-center">
-            <!-- صورة احترافية לרقم 8 -->
             <img src="https://images.unsplash.com/photo-1542204637-e11b02130e58?q=80&w=2070&auto=format&fit=crop" alt="TV Background 8" class="w-full h-full object-cover opacity-60">
             <div class="absolute text-center bg-slate-900/80 p-8 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
                 <h1 class="text-6xl font-bold mb-4 text-blue-500 drop-shadow-lg tracking-wider">sc8tv</h1>
@@ -121,9 +119,8 @@
         let isExpanded = true; 
         let activeChannelId = null;
 
-        // أيقونات الأسهم المطابقة للطلب (خارج/داخل)
         const iconExpand = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7zm11-7h-2v3.59l-4.5-4.5 1.41-1.41 4.5 4.5V10h2v7zM3 10h2V6.41l4.5 4.5 1.41-1.41-4.5-4.5H10V3H3v7zm18-7h-7v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V10h2V3z"/></svg>`;
-        const iconShrink = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6z"/></svg>`;
+        const iconShrink = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6 z"/></svg>`;
 
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
@@ -132,22 +129,17 @@
                 if (filteredChannels.length === 0) continue;
 
                 const catDiv = document.createElement('div');
-                catDiv.className = 'mb-5';
+                catDiv.className = 'mb-4';
                 
-                // المربع حول الاسم فقط (إطار أزرق خفيف)
-                catDiv.innerHTML = `
-                    <div class="mb-3">
-                        <h3 class="inline-block text-blue-200 text-sm font-bold bg-slate-800 py-1.5 px-4 rounded border border-blue-400/50 shadow-sm">${category}</h3>
-                    </div>
-                `;
+                // المربعات حول أسماء الأقسام كما كانت تماماً
+                catDiv.innerHTML = `<h3 class="text-blue-200 text-sm font-bold bg-slate-800 border border-blue-400/40 py-1.5 px-3 mb-2 rounded shadow-sm">${category}</h3>`;
                 
                 const ul = document.createElement('ul');
-                ul.className = 'space-y-1.5';
+                ul.className = 'space-y-1';
                 
                 filteredChannels.forEach(ch => {
                     const li = document.createElement('li');
                     
-                    // لون أزرق ثابت خفيف للقناة النشطة
                     const isActive = activeChannelId === ch.id;
                     const bgClass = isActive ? 'bg-blue-600/80 text-white font-semibold' : 'text-gray-300 hover:bg-slate-700/80 hover:text-white';
                     
@@ -187,7 +179,7 @@
                 width: "100%",
                 height: "100%",
                 autostart: true,
-                stretching: "exactfit", // إجبار البلاير على السماح بالتمدد
+                stretching: "exactfit",
                 drm: { clearkey: { keyId: k1, key: k2 } }
             });
 
