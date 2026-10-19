@@ -18,10 +18,17 @@
         body { background-color: #0f172a; overflow: hidden; margin: 0; }
         #jwplayerDiv { width: 100% !important; height: 100% !important; }
         
-        /* التحكم التلقائي في الأبعاد لملء الشاشة بالكامل */
-        .expanded-video video { object-fit: fill !important; } /* تمدد تلقائي للملء الكامل */
-        .contained-video video { object-fit: contain !important; } /* أبعاد أصلية */
+        /* التحكم التلقائي لأبعاد الشاشة 720p وأي شاشة أخرى */
+        .expanded-video video { 
+            object-fit: fill !important; /* إجبار الصورة على التمدد لكل الحواف */
+            width: 100% !important; 
+            height: 100% !important; 
+        } 
+        .contained-video video { 
+            object-fit: contain !important; /* الحفاظ على الأبعاد الأصلية */
+        }
         
+        /* تجميل شريط التمرير للقنوات */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
@@ -32,30 +39,30 @@
     <!-- Sidebar / قائمة القنوات -->
     <div class="w-72 bg-slate-900 h-full flex flex-col fixed left-0 top-0 border-r border-slate-800 z-50 shadow-xl">
         
-        <!-- Header: البحث على اليمين وزر الرئيسية على اليسار -->
+        <!-- Header: زر الرئيسية على اليسار ثم البحث -->
         <div class="p-4 bg-slate-800 flex items-center gap-3 border-b border-slate-700">
             <div class="relative flex-1">
-                <input type="text" id="searchInput" placeholder="ابحث عن قناة..." class="w-full bg-slate-700 text-white px-3 py-2 pr-9 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400 transition shadow-inner">
+                <input type="text" id="searchInput" placeholder="ابحث عن قناة..." class="w-full bg-slate-700 text-white px-3 py-2 pr-9 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400">
                 <i class="fa-solid fa-search absolute right-3 top-2.5 text-gray-400 text-sm"></i>
             </div>
-            <button id="homeBtn" class="bg-slate-700 hover:bg-blue-600 text-white p-2 rounded transition flex-shrink-0 shadow-md" title="الشاشة الرئيسية / إغلاق البث">
+            <button id="homeBtn" class="bg-slate-700 hover:bg-blue-600 text-white p-2 rounded transition flex-shrink-0" title="الشاشة الرئيسية / إغلاق البث">
                 <i class="fa-solid fa-house"></i>
             </button>
         </div>
 
         <!-- القنوات -->
-        <div class="flex-1 overflow-y-auto p-3" id="channelListContainer"></div>
+        <div class="flex-1 overflow-y-auto p-4" id="channelListContainer"></div>
     </div>
 
     <!-- Main Content / منطقة الفيديو -->
     <div class="flex-1 h-full relative" style="margin-left: 18rem;">
         
-        <!-- الشاشة الرئيسية -->
+        <!-- الشاشة الرئيسية (صورة رقم 8) -->
         <div id="homeScreen" class="absolute inset-0 z-10 bg-black flex flex-col items-center justify-center">
-            <img src="https://images.unsplash.com/photo-1505686994434-e3cc5abf1330?q=80&w=2073&auto=format&fit=crop" alt="TV Background" class="w-full h-full object-cover opacity-40">
-            <div class="absolute text-center bg-slate-900/70 p-10 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
-                <i class="fa-solid fa-tv text-6xl text-blue-500 mb-4"></i>
-                <h1 class="text-5xl font-bold mb-4 text-white drop-shadow-lg tracking-wide">sc8tv</h1>
+            <!-- صورة احترافية לרقم 8 -->
+            <img src="https://images.unsplash.com/photo-1542204637-e11b02130e58?q=80&w=2070&auto=format&fit=crop" alt="TV Background 8" class="w-full h-full object-cover opacity-60">
+            <div class="absolute text-center bg-slate-900/80 p-8 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
+                <h1 class="text-6xl font-bold mb-4 text-blue-500 drop-shadow-lg tracking-wider">sc8tv</h1>
                 <p class="text-lg text-gray-300 drop-shadow-md">اختر قناة من القائمة الجانبية لبدء المشاهدة</p>
             </div>
         </div>
@@ -67,7 +74,7 @@
     </div>
 
     <script>
-        // تزوير الهوية
+        // تزوير الهوية (User-Agent) للسيرفر
         (function() {
             var originalFetch = window.fetch;
             var originalXHR = window.XMLHttpRequest;
@@ -105,15 +112,6 @@
                 { id: "art-cinema", name: "ART سينما", url: "https://ev-fast-mpd.starzplayarabia.com/live/eds/ART_Cinema/DASH/ART_Cinema.mpd", k1: "bd484fc91dcf152010a0e367e15ab60e", k2: "d9bed0a77b7da410129820bcc6606670" },
                 { id: "art-hekayat1", name: "ART حكايات 1", url: "https://ev-fast-mpd.starzplayarabia.com/live/eds/ART_Hekayat/DASH/ART_Hekayat.mpd", k1: "3d614bb04140eda383d117fb55e9a361", k2: "b669cdf2cb65eff56d1e3534c7a54b53" },
                 { id: "art-hekayat2", name: "ART حكايات 2", url: "https://ev-fast-mpd.starzplayarabia.com/live/eds/ART_Hekayat_2/DASH/ART_Hekayat_2.mpd", k1: "4ccb01903d6868e27953ff0298d4ac05", k2: "d156518d6ab453d9f9d12c243280be8f" }
-            ],
-            "قنوات منوعة": [
-                { id: "mbc-action", name: "MBC Action", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-action/8ea6ca1108d03e03da5e61372354f5c8/index.mpd", k1: "e3ce77324a3d4fa2a913b26cc1976052", k2: "17774f82a3b9e33ea7a149596acbb20f" },
-                { id: "mbc-masr-2", name: "MBC Masr 2", url: "https://shd-mediacdn-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/7eaa7c0393e9a9637ae311aac75eb40e/index.mpd", k1: "e3ce77324a3d4fa2a913b26cc1976052", k2: "17774f82a3b9e33ea7a149596acbb20f" },
-                { id: "Sport_2SK", name: "Sport 2 SK", url: "https://dash2.antik.sk/stream/nvidia_sport2/playlist_cenc.mpd", k1: "11223344556677889900112233445566", k2: "4b80724d0ef86bcb2c21f7999d67739d" },
-                { id: "ZIGGO_1", name: "ZIGGO 1", url: "https://mag04.tvx.prd.tv.odido.nl/wh7f454c46tw75168188_-627298088/PLTV/86/224/3221241590/3221241590.mpd?accountinfo=~~V2.0~qbcsJh_jU5C9BcZc959e_wae44b4867b3417aa76b5db2da20fe46c~KZzTWjB8qD1zdgbJjRPVLJX-tV0qiN9RBHC_iseGrsmTSRjj06oGDtGlpSCRGOwF3626cf085c08d024c7e4aafc18c32440:UTC,", k1: "ef34ae91b4f2415e8439b2ad105e7488", k2: "243248d8de1ff8c7c587ee2057317523" },
-                { id: "Fubo_Sports_2", name: "Fubo Sports 2", url: "https://otte.live.fly.ww.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/uiffe4jhf0/out/v1/3534efafca8c4815adbb4d2e9a1fe003/cenc.mpd", k1: "3dcfbec0e7146928baa55210bf2cb62f", k2: "bc85f74f815d9be5ae1dd6defaa05135" },
-                { id: "Premier_League", name: "Premier League", url: "https://otte.live.fly.ww.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/uiffe4jhf0/out/v1/3534efafca8c4815adbb4d2e9a1fe003/cenc.mpd", k1: "3dcfbec0e7146928baa55210bf2cb62f", k2: "bc85f74f815d9be5ae1dd6defaa05135" },
-                { id: "Матч!_1", name: "Матч! 1", url: "https://video.beeline.tv/live/d/channel319.isml/manifest-stb.mpd", k1: "ce7cf9b28d1a8d874accebc44d7e1fcd", k2: "cda18d4d20abd5cc778315abe277feb9" }
             ]
         };
 
@@ -123,8 +121,9 @@
         let isExpanded = true; 
         let activeChannelId = null;
 
-        const iconExpand = `<svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`;
-        const iconShrink = `<svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>`;
+        // أيقونات الأسهم المطابقة للطلب (خارج/داخل)
+        const iconExpand = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M10 21v-2H6.41l4.5-4.5-1.41-1.41-4.5 4.5V14H3v7h7zm11-7h-2v3.59l-4.5-4.5 1.41-1.41 4.5 4.5V10h2v7zM3 10h2V6.41l4.5 4.5 1.41-1.41-4.5-4.5H10V3H3v7zm18-7h-7v2h3.59l-4.5 4.5 1.41 1.41 4.5-4.5V10h2V3z"/></svg>`;
+        const iconShrink = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6z"/></svg>`;
 
         function renderChannels(filter = "") {
             channelListContainer.innerHTML = '';
@@ -132,27 +131,31 @@
                 const filteredChannels = channels.filter(ch => ch.name.includes(filter) || ch.id.toLowerCase().includes(filter.toLowerCase()));
                 if (filteredChannels.length === 0) continue;
 
-                // إطار أزرق خفيف حول القسم
                 const catDiv = document.createElement('div');
-                catDiv.className = 'mb-4 border border-blue-500/40 rounded-lg p-2 bg-slate-800/40 shadow-sm';
+                catDiv.className = 'mb-5';
                 
-                catDiv.innerHTML = `<h3 class="text-blue-200 text-sm font-bold bg-slate-900/50 py-1.5 px-3 mb-2 rounded border-r-2 border-blue-500">${category}</h3>`;
+                // المربع حول الاسم فقط (إطار أزرق خفيف)
+                catDiv.innerHTML = `
+                    <div class="mb-3">
+                        <h3 class="inline-block text-blue-200 text-sm font-bold bg-slate-800 py-1.5 px-4 rounded border border-blue-400/50 shadow-sm">${category}</h3>
+                    </div>
+                `;
                 
                 const ul = document.createElement('ul');
-                ul.className = 'space-y-1';
+                ul.className = 'space-y-1.5';
                 
                 filteredChannels.forEach(ch => {
                     const li = document.createElement('li');
                     
-                    // لون أزرق خفيف للقناة المختارة
+                    // لون أزرق ثابت خفيف للقناة النشطة
                     const isActive = activeChannelId === ch.id;
-                    const bgClass = isActive ? 'bg-blue-800/60 border-r-4 border-blue-400 text-blue-100 font-semibold' : 'text-gray-300 hover:bg-slate-700 hover:text-white border-r-4 border-transparent';
+                    const bgClass = isActive ? 'bg-blue-600/80 text-white font-semibold' : 'text-gray-300 hover:bg-slate-700/80 hover:text-white';
                     
                     li.innerHTML = `
                         <button onclick="playChannel('${ch.id}', '${ch.url}', '${ch.k1}', '${ch.k2}')" 
-                            class="w-full text-right px-3 py-2.5 text-sm rounded transition flex justify-between items-center group ${bgClass}">
+                            class="w-full text-right px-3 py-2 text-sm rounded transition flex justify-between items-center group ${bgClass}">
                             <span>${ch.name}</span>
-                            <i class="fa-solid fa-play text-xs ${isActive ? 'opacity-100 text-blue-300' : 'opacity-0 group-hover:opacity-100'} transition"></i>
+                            <i class="fa-solid fa-play text-xs ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition"></i>
                         </button>
                     `;
                     ul.appendChild(li);
@@ -184,7 +187,7 @@
                 width: "100%",
                 height: "100%",
                 autostart: true,
-                stretching: "exactfit", 
+                stretching: "exactfit", // إجبار البلاير على السماح بالتمدد
                 drm: { clearkey: { keyId: k1, key: k2 } }
             });
 
